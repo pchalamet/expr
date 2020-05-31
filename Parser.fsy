@@ -1,0 +1,30 @@
+%{ 
+open AbstractSyntaxTree 
+%} 
+ 
+%start Expr 
+ 
+// terminal tokens
+%token <float> NUMBER
+%token <string> SYMBOL
+%token <string> DOT
+%token PLUS MINUS TIMES DIVIDE LPAREN RPAREN
+%token EOF
+ 
+// associativity and precedences
+%left PLUS MINUS 
+%left TIMES DIVIDE
+ 
+// return type of Expr
+%type <Expression> Expr
+ 
+%% 
+ 
+Expr: NUMBER                  { Number $1 }
+    | SYMBOL                  { Symbol $1 }
+    | SYMBOL DOT SYMBOL       { Field ($1, $3) }
+    | Expr PLUS Expr          { Function (Plus, $1, $3) } 
+    | Expr MINUS Expr         { Function (Minus, $1, $3) } 
+    | Expr TIMES Expr         { Function (Times, $1, $3) } 
+    | Expr DIVIDE Expr        { Function (Divide, $1, $3) }
+    | LPAREN Expr RPAREN      { $2 }
